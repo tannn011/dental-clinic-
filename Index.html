@@ -1,0 +1,565 @@
+{
+  "id": "QIkMJhue2s5le6jM",
+  "meta": {
+    "instanceId": "c2650793f644091dc80fb900fe63448ad1f4b774008de9608064d67294f8307c",
+    "templateCredsSetupCompleted": true
+  },
+  "name": "Reranks #1",
+  "tags": [],
+  "nodes": [
+    {
+      "id": "f0678325-baee-4210-886b-72d4e4fcc4ce",
+      "name": "Search File",
+      "type": "n8n-nodes-base.googleDrive",
+      "position": [
+        3680,
+        580
+      ],
+      "parameters": {
+        "filter": {
+          "folderId": {
+            "__rl": true,
+            "mode": "list",
+            "value": "1dh1Rr2yrhSdoSYpiR8s1yXiSWLYxpoLJ",
+            "cachedResultUrl": "https://drive.google.com/drive/folders/1dh1Rr2yrhSdoSYpiR8s1yXiSWLYxpoLJ",
+            "cachedResultName": "ReCharge"
+          }
+        },
+        "options": {},
+        "resource": "fileFolder",
+        "returnAll": true
+      },
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "nTWGelaHlbvHrG66",
+          "name": "Khaisa Studio"
+        }
+      },
+      "typeVersion": 3
+    },
+    {
+      "id": "52a98bc4-4364-49cd-b7dc-5ea77024473e",
+      "name": "Get Data",
+      "type": "n8n-nodes-base.googleDrive",
+      "position": [
+        3840,
+        580
+      ],
+      "parameters": {
+        "fileId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "={{ $json.id }}"
+        },
+        "options": {},
+        "operation": "download"
+      },
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "nTWGelaHlbvHrG66",
+          "name": "Khaisa Studio"
+        }
+      },
+      "typeVersion": 3
+    },
+    {
+      "id": "13e41f0e-c890-4e8c-8fc0-76615187c1db",
+      "name": "Supabase Vector Store",
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreSupabase",
+      "position": [
+        4080,
+        380
+      ],
+      "parameters": {
+        "mode": "insert",
+        "options": {},
+        "tableName": {
+          "__rl": true,
+          "mode": "list",
+          "value": "documents",
+          "cachedResultName": "documents"
+        }
+      },
+      "credentials": {
+        "supabaseApi": {
+          "id": "rb73xq0erYUAZCau",
+          "name": "REcharge"
+        }
+      },
+      "typeVersion": 1.1
+    },
+    {
+      "id": "739dd64e-9493-41de-b5aa-f0a376e8ce85",
+      "name": "Embeddings OpenAI",
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
+      "position": [
+        4060,
+        560
+      ],
+      "parameters": {
+        "options": {}
+      },
+      "credentials": {
+        "openAiApi": {
+          "id": "IWdqsaVAq1AL1S28",
+          "name": "n8n - Money manager Khairul"
+        }
+      },
+      "typeVersion": 1.2
+    },
+    {
+      "id": "6674cbfc-c0e0-48e1-b044-d7ee693dfc83",
+      "name": "Default Data Loader",
+      "type": "@n8n/n8n-nodes-langchain.documentDefaultDataLoader",
+      "position": [
+        4200,
+        580
+      ],
+      "parameters": {
+        "options": {},
+        "dataType": "binary"
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "b3c042bb-4c0b-4dd3-ac7e-be7a99d792df",
+      "name": "Recursive Character Text Splitter",
+      "type": "@n8n/n8n-nodes-langchain.textSplitterRecursiveCharacterTextSplitter",
+      "position": [
+        4240,
+        720
+      ],
+      "parameters": {
+        "options": {}
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "13cff178-5db2-478e-97de-dee175b62a8f",
+      "name": "Loop Over Items",
+      "type": "n8n-nodes-base.splitInBatches",
+      "position": [
+        3860,
+        380
+      ],
+      "parameters": {
+        "options": {}
+      },
+      "typeVersion": 3
+    },
+    {
+      "id": "a077fb5d-f2c5-40c4-9dd5-6abc28a21311",
+      "name": "AI Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "position": [
+        2380,
+        740
+      ],
+      "parameters": {
+        "text": "={{ $json.payload._data.key.id }}",
+        "options": {
+          "systemMessage": "=You are a business intelligence assistant for ReCharge with access to:\n\n1. **company knowledge based** - General business documents and guides\n2. **Restaurant Leads Database** - Potential restaurant clients with ratings, contact info, and business details\n\nYou can help with:\n- Finding high-potential restaurant leads by location, rating, or category\n- Analyzing restaurant market opportunities  \n- Providing restaurant recommendations and insights\n- Preparing cold outreach strategies with personalized data\n- Business intelligence from collected restaurant data\n\nAlways use both knowledge sources to provide comprehensive answers."
+        },
+        "promptType": "define"
+      },
+      "typeVersion": 2
+    },
+    {
+      "id": "ef8f5cec-f189-4d46-b5b3-7a07b201f942",
+      "name": "OpenAI Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "position": [
+        2320,
+        900
+      ],
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4o-mini"
+        },
+        "options": {}
+      },
+      "credentials": {
+        "openAiApi": {
+          "id": "IWdqsaVAq1AL1S28",
+          "name": "n8n - Money manager Khairul"
+        }
+      },
+      "typeVersion": 1.2
+    },
+    {
+      "id": "c054fd37-688b-40ef-86c7-fb7ada0b13ba",
+      "name": "Postgres Chat Memory",
+      "type": "@n8n/n8n-nodes-langchain.memoryPostgresChat",
+      "position": [
+        2460,
+        900
+      ],
+      "parameters": {
+        "sessionKey": "={{ $('WAHA Trigger').item.json.payload._data.key.remoteJid }}",
+        "sessionIdType": "customKey",
+        "contextWindowLength": 20
+      },
+      "credentials": {
+        "postgres": {
+          "id": "8PMGgjtS4muxnKxT",
+          "name": "ReCharge Database"
+        }
+      },
+      "typeVersion": 1.3
+    },
+    {
+      "id": "482e862f-6592-4d02-9bd1-6b50d1e87e5b",
+      "name": "Embeddings OpenAI1",
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
+      "position": [
+        2600,
+        1040
+      ],
+      "parameters": {
+        "options": {}
+      },
+      "credentials": {
+        "openAiApi": {
+          "id": "IWdqsaVAq1AL1S28",
+          "name": "n8n - Money manager Khairul"
+        }
+      },
+      "typeVersion": 1.2
+    },
+    {
+      "id": "3b6a1f51-882b-4f0c-9e39-2676c08f1e71",
+      "name": "Google Drive Trigger",
+      "type": "n8n-nodes-base.googleDriveTrigger",
+      "position": [
+        3500,
+        580
+      ],
+      "parameters": {
+        "event": "fileUpdated",
+        "options": {
+          "fileType": "all"
+        },
+        "pollTimes": {
+          "item": [
+            {
+              "hour": 0
+            }
+          ]
+        },
+        "triggerOn": "specificFolder",
+        "folderToWatch": {
+          "__rl": true,
+          "mode": "list",
+          "value": "1dh1Rr2yrhSdoSYpiR8s1yXiSWLYxpoLJ",
+          "cachedResultUrl": "https://drive.google.com/drive/folders/1dh1Rr2yrhSdoSYpiR8s1yXiSWLYxpoLJ",
+          "cachedResultName": "ReCharge"
+        }
+      },
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "nTWGelaHlbvHrG66",
+          "name": "Khaisa Studio"
+        }
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "91703e9f-78c7-4db3-a58f-b9736379d6f5",
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        3420,
+        260
+      ],
+      "parameters": {
+        "color": 5,
+        "width": 1100,
+        "height": 620,
+        "content": "# Company Knowledge Base\n"
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "0ea74b68-0ade-4b9a-9371-38184aac722f",
+      "name": "When clicking ‘Execute workflow’",
+      "type": "n8n-nodes-base.manualTrigger",
+      "position": [
+        2080,
+        180
+      ],
+      "parameters": {},
+      "typeVersion": 1
+    },
+    {
+      "id": "9150f04a-1201-41e8-902d-dcf18c7a6bb2",
+      "name": "Scrape Maps",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        2520,
+        180
+      ],
+      "parameters": {
+        "url": "<your apify url>",
+        "method": "POST",
+        "options": {},
+        "jsonBody": "={\n    \"includeWebResults\": false,\n    \"language\": \"id\",\n    \"locationQuery\": \"{{ $json.lokasi }}\",\n    \"maxCrawledPlacesPerSearch\": 500,\n    \"maxImages\": 0,\n    \"maximumLeadsEnrichmentRecords\": 0,\n    \"scrapeContacts\": false,\n    \"scrapeDirectories\": false,\n    \"scrapeImageAuthors\": false,\n    \"scrapePlaceDetailPage\": false,\n    \"scrapeReviewsPersonalData\": true,\n    \"scrapeTableReservationProvider\": false,\n    \"searchStringsArray\": [\n        \"Restoran\"\n    ],\n    \"skipClosedPlaces\": false\n}",
+        "sendBody": true,
+        "specifyBody": "json"
+      },
+      "typeVersion": 4.2
+    },
+    {
+      "id": "ee02f5bb-be98-4344-b9d3-1637e923d7e2",
+      "name": "Clean Data",
+      "type": "n8n-nodes-base.code",
+      "position": [
+        2520,
+        380
+      ],
+      "parameters": {
+        "jsCode": "// Bersihkan dan format data dari spreadsheet\nconst cleanData = $input.all().map(item => {\n  const data = item.json;\n  \n  // Parse JSON strings jadi array yang mudah dibaca\n  function parseJsonField(field) {\n    try {\n      if (!field || field === 'not found') return [];\n      const parsed = JSON.parse(field);\n      if (Array.isArray(parsed)) {\n        return parsed.map(item => {\n          if (typeof item === 'object') {\n            return Object.keys(item).filter(key => item[key] === true);\n          }\n          return item;\n        }).flat();\n      }\n      return [];\n    } catch {\n      return [];\n    }\n  }\n  \n  // Parse opening hours jadi format mudah dibaca\n  function parseOpeningHours(hoursString) {\n    try {\n      if (!hoursString) return 'Jam buka tidak tersedia';\n      const hours = JSON.parse(hoursString);\n      return hours.map(h => `${h.day}: ${h.hours}`).join(', ');\n    } catch {\n      return 'Jam buka tidak tersedia';\n    }\n  }\n  \n  // Ekstrak data bersih\n  const keunggulan = parseJsonField(data.Keunggulan);\n  const fasilitas = parseJsonField(data.Fasilitas);\n  const pembayaran = parseJsonField(data.Pembayaran);\n  const allCategories = parseJsonField(data['All Categories']);\n  const openingHours = parseOpeningHours(data['Opening Hours']);\n  \n  // Buat deskripsi lengkap untuk AI\n  const businessDescription = `\n${data.Title} adalah ${data.Category} yang berlokasi di ${data.Neighborhood}. \nRating: ${data.Rating}/5 dengan ${data.Reviews} review. \nHarga: ${data.Price || 'Tidak diketahui'}.\n${data.Description || ''}\n\nKeunggulan: ${keunggulan.join(', ') || 'Tidak ada info keunggulan'}\nFasilitas: ${fasilitas.join(', ') || 'Tidak ada info fasilitas'}  \nMetode Pembayaran: ${pembayaran.join(', ') || 'Tidak ada info pembayaran'}\nKategori: ${allCategories.join(', ') || data.Category}\nJam Buka: ${openingHours}\n\nKontak: ${data.Phone || 'Tidak ada nomor telepon'}\nWebsite: ${data.Website !== 'not found' ? data.Website : 'Tidak ada website'}\nAlamat Lengkap: ${data.Address}\n`.trim();\n\n  // Hitung lead score\n  let leadScore = 0;\n  if (data.Rating >= 4.5) leadScore += 30;\n  if (data.Rating >= 4.0) leadScore += 20;\n  if (data.Reviews >= 1000) leadScore += 25;\n  if (data.Reviews >= 100) leadScore += 15;\n  if (data.Phone) leadScore += 20;\n  if (data.Website && data.Website !== 'not found') leadScore += 20;\n  if (keunggulan.length > 0) leadScore += 10;\n\n  return {\n    // Data utama\n    restaurant_name: data.Title,\n    category: data.Category,\n    description: data.Description || '',\n    location: data.Neighborhood,\n    full_address: data.Address,\n    phone: data.Phone,\n    website: data.Website !== 'not found' ? data.Website : '',\n    rating: data.Rating,\n    total_reviews: data.Reviews,\n    price_range: data.Price || 'Tidak diketahui',\n    \n    // Data terformat\n    keunggulan_list: keunggulan.join(', '),\n    fasilitas_list: fasilitas.join(', '),\n    pembayaran_list: pembayaran.join(', '),\n    kategori_lengkap: allCategories.join(', '),\n    jam_operasional: openingHours,\n    \n    // Untuk AI analysis\n    business_summary: businessDescription,\n    lead_score: leadScore,\n    lead_quality: leadScore >= 70 ? 'High' : leadScore >= 40 ? 'Medium' : 'Low',\n    \n    // Metadata\n    scraped_date: new Date().toLocaleString('id-ID'),\n    data_source: 'Google Maps via Apify'\n  };\n});\n\nreturn cleanData;"
+      },
+      "typeVersion": 2
+    },
+    {
+      "id": "93664ba7-c18c-4064-b984-f592791cb731",
+      "name": "Update Data",
+      "type": "n8n-nodes-base.googleSheets",
+      "position": [
+        2740,
+        380
+      ],
+      "parameters": {
+        "columns": {
+          "value": {
+            "Phone": "={{ $json.phone }}",
+            "Price": "={{ $json.price_range }}",
+            "Title": "={{ $json.restaurant_name }}",
+            "Rating": "={{ $json.rating }}",
+            "Address": "={{ $json.full_address }}",
+            "Reviews": "={{ $json.total_reviews }}",
+            "Website": "={{ $json.website }}",
+            "Category": "={{ $json.category }}",
+            "Fasilitas": "={{ $json.fasilitas_list }}",
+            "Keunggulan": "={{ $json.keunggulan_list }}",
+            "Lead Score": "={{ $json.lead_score }}",
+            "Pembayaran": "={{ $json.pembayaran_list }}",
+            "row_number": "={{ $('Get Leads').item.json.row_number }}",
+            "Description": "={{ $json.description }}",
+            "Lead Quality": "={{ $json.lead_quality }}",
+            "Neighborhood": "={{ $json.location }}",
+            "Opening Hours": "={{ $json.jam_operasional }}",
+            "All Categories": "={{ $json.kategori_lengkap }}"
+          },
+          "schema": [
+            {
+              "id": "Title",
+              "type": "string",
+              "display": true,
+              "removed": false,
+              "required": false,
+              "displayName": "Title",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Description",
+              "type": "string",
+              "display": true,
+              "required": false,
+              "displayName": "Description",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Category",
+              "type": "string",
+              "display": true,
+              "required": false,
+              "displayName": "Category",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Address",
+              "type": "string",
+              "display": true,
+              "required": false,
+              "displayName": "Address",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Phone",
+              "type": "string",
+              "display": true,
+              "required": false,
+              "displayName": "Phone",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Rating",
+              "type": "string",
+              "display": true,
+              "required": false,
+              "displayName": "Rating",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Reviews",
+              "type": "string",
+              "display": true,
+              "required": false,
+              "displayName": "Reviews",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Price",
+              "type": "string",
+              "display": true,
+              "required": false,
+              "displayName": "Price",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Website",
+              "type": "string",
+              "display": true,
+              "required": false,
+              "displayName": "Website",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Neighborhood",
+              "type": "string",
+              "display": true,
+              "required": false,
+              "displayName": "Neighborhood",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Opening Hours",
+              "type": "string",
+              "display": true,
+              "required": false,
+              "displayName": "Opening Hours",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "All Categories",
+              "type": "string",
+              "display": true,
+              "required": false,
+              "displayName": "All Categories",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Keunggulan",
+              "type": "string",
+              "display": true,
+              "required": false,
+              "displayName": "Keunggulan",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Fasilitas",
+              "type": "string",
+              "display": true,
+              "required": false,
+              "displayName": "Fasilitas",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Pembayaran",
+              "type": "string",
+              "display": true,
+              "required": false,
+              "displayName": "Pembayaran",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Lead Score",
+              "type": "string",
+              "display": true,
+              "removed": false,
+              "required": false,
+              "displayName": "Lead Score",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Lead Quality",
+              "type": "string",
+              "display": true,
+              "removed": false,
+              "required": false,
+              "displayName": "Lead Quality",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "row_number",
+              "type": "string",
+              "display": true,
+              "removed": false,
+              "readOnly": true,
+              "required": false,
+              "displayName": "row_number",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            }
+          ],
+          "mappingMode": "defineBelow",
+          "matchingColumns": [
+            "row_number"
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {},
+        "operation": "update",
+        "sheetName": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gid=0",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1DKXYqpb0EWNYsbq2x8h5xqUWXy772toNDVrl8d-8nfA/edit#gid=0",
+          "cachedResultName": "Restaurant"
+        },
+        "documentId": {
+          "__rl": true,
+          "mode": "url",
+          "value": "https://docs.google.com/spreadsheets/d/1DKXYqpb0EWNYsbq2x8h5xqUWXy772toNDVrl8d-8nfA/edit?usp=sharing"
+        },
+        "authentication": "serviceAccount"
+      },
+      "credentials": {
+        "googleApi": {
+          "id": "Os8sgTGkRS1YybbJ",
+          "name": "Sheet & Drive"
+        }
+      },
+      "typeVersion": 4.6
+    },
+    {
+      "id": "51681e42-74ca-4fe8-9254-40f150c0a2aa",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "disabled": true,
+      "position": [
+        2080,
+        380
+      ],
+      "webhook
